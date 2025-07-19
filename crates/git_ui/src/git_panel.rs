@@ -52,6 +52,7 @@ use project::{
     Fs, Project, ProjectPath,
     git_store::{GitStoreEvent, Repository},
 };
+use prompt_store::{PromptBuilder, PromptLoadingParams};
 use serde::{Deserialize, Serialize};
 use settings::{Settings as _, SettingsStore};
 use std::future::Future;
@@ -1830,6 +1831,11 @@ impl GitPanel {
         });
 
         let temperature = AgentSettings::temperature_for_model(&model, cx);
+        let prompt_builder = PromptBuilder::new(Some(PromptLoadingParams {
+            repo_path: None,
+            cx: cx,
+            fs: self.fs.clone(),
+        }));
 
         self.generate_commit_message_task = Some(cx.spawn(async move |this, cx| {
              async move {
@@ -1862,13 +1868,13 @@ impl GitPanel {
 
                 let text_empty = subject.trim().is_empty();
 
-                let content = if text_empty {
-                    format!("{PROMPT}\nHere are the changes in this commit:\n{diff_text}")
-                } else {
-                    format!("{PROMPT}\nHere is the user's subject line:\n{subject}\nHere are the changes in this commit:\n{diff_text}\n")
-                };
+                let prompt = prompt_builder?.generate_commit_message_assisant_prompt()?;
 
-                const PROMPT: &str = include_str!("commit_message_prompt.txt");
+                let content = if text_empty {
+                    format!("{prompt}\nHere are the changes in this commit:\n{diff_text}")
+                } else {
+                    format!("{prompt}\nHere is the user's subject line:\n{subject}\nHere are the changes in this commit:\n{diff_text}\n")
+                };
 
                 let request = LanguageModelRequest {
                     thread_id: None,

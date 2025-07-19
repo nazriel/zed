@@ -45,6 +45,7 @@ panel.workspace = true
 picker.workspace = true
 postage.workspace = true
 project.workspace = true
+prompt_store.workspace = true
 schemars.workspace = true
 serde.workspace = true
 serde_derive.workspace = true

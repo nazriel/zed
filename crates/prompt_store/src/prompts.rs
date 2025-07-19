@@ -444,6 +444,15 @@ impl PromptBuilder {
             .lock()
             .render("terminal_assistant_prompt", &context)
     }
+
+    pub fn generate_commit_message_assisant_prompt(&self) -> Result<String, RenderError> {
+        #[derive(Serialize)]
+        struct NoContext {}
+        let commit_context = NoContext {};
+        self.handlebars
+            .lock()
+            .render("commit_message_prompt", &commit_context)
+    }
 }
 
 #[cfg(test)]

@@ -6360,6 +6360,7 @@ dependencies = [
  "postage",
  "pretty_assertions",
  "project",
+ "prompt_store",
  "schemars",
  "serde",
  "serde_derive",
